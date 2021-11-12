@@ -1,5 +1,6 @@
 #include <glad\glad.h>
 #include <sdl.h>
+#include <iostream>
 
 // vertices
 const float vertices[] =
@@ -68,10 +69,27 @@ int main(int argc, char** argv)
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(vertexShader);
 
+	GLint status;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		char buffer[512];
+		glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
+		std::cout << buffer;
+	}
+
 	//Set Fragment Shader
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
+
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
+	if (status == GL_FALSE)
+	{
+		char buffer[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
+		std::cout << buffer;
+	}
 
 	//Create Shader Program
 	GLuint shaderProgram = glCreateProgram();
