@@ -9,7 +9,7 @@ namespace glds
 		owner->transform.position += velocity * owner->scene->engine->time.deltaTime;
 		velocity *= damping;
 		
-		acceleration = glm::vec3{0};
+		acceleration = glm::vec3{0.0f,0.0f,0.0f};
 	}
 
 	bool PhysicsComponent::Write(const rapidjson::Value& value) const

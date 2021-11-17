@@ -1,26 +1,26 @@
 #pragma once
-#include "Resource/ResourceSystem.h"
+#include "Renderer.h"
+#include "Resource/Resource.h"
 #include "Math/MathTypes.h"
 #include <SDL.h>
-#include <iostream>
+
 
 namespace glds
 {
 	class Texture : public Resource
 	{
 	public:
-		Texture() {}
-		Texture(class Renderer* renderer);
+		~Texture();
+		bool Load(const std::string& name, void* null) override;
 
-		bool Create(SDL_Surface* surface);
-		bool Load(const std::string& name, void* data) override;
+		void Bind() { glBindTexture(target, texture); }
+		bool CreateTexture(const std::string& filename, GLenum target = GL_TEXTURE_2D, GLuint unit = GL_TEXTURE0);
 
-		glm::vec2 GetSize() const;
+		static void FlipSurface(SDL_Surface* surface);
 
-		friend class Renderer;
-
-	private:
-		SDL_Texture* texture{ nullptr };
-		SDL_Renderer* renderer{ nullptr };
+	protected:
+		GLenum target{ GL_TEXTURE_2D };
+		GLuint unit{ GL_TEXTURE0 };
+		GLuint texture{ 0 };
 	};
 }
