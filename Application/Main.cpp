@@ -1,4 +1,4 @@
-//#include "Engine.h"
+#include "Engine.h"
 
 #include <glad\glad.h>
 #include <SDL.h>
@@ -10,10 +10,10 @@
 // vertices
 const float vertices[] =
 {
-	-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-	 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-	-0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f
+	-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+	-0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f
 };
 
 const GLuint indices[] =
@@ -22,91 +22,23 @@ const GLuint indices[] =
 	0, 3, 2
 };
 
-// vertex shader
-const char* vertexSource = R"(
-    #version 430 core 
-    layout(location = 0) in vec3 position;
-	layout(location = 1) in vec3 color;
-
-	out vec3 fs_color;
-	
-	uniform float scale;
-
-    void main()
-    {
-		fs_color = color;
-        gl_Position = vec4(position * scale, 1.0);
-    }
-)";
-
-
-
-// fragment
-const char* fragmentSource = R"(
-    #version 430 core
-	in vec3 fs_color;
-	out vec4 outColor;
-
-	uniform vec3 tint;
-
-    void main()
-    {
-        outColor = vec4(fs_color * tint, 1.0);
-    }
-)";
-
 int main(int argc, char** argv)
 {
-	//glds::Engine engine;
-	//engine.Startup();
-	//engine.Get<glds::Renderer>()->Create("OpenGL", 800, 600);
+	glds::Engine engine;
+	engine.Startup();
+	engine.Get<glds::Renderer>()->Create("OpenGL", 800, 600);
 
-	//glds::SeedRandom(static_cast<unsigned int>(time(nullptr)));
-	//glds::SetFilePath("../resources");
+	glds::SeedRandom(static_cast<unsigned int>(time(nullptr)));
+	glds::SetFilePath("../resources");
 
-	// Set Vertex Shader
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	glCompileShader(vertexShader);
+	std::shared_ptr<glds::Program> program = engine.Get<glds::ResourceSystem>()->Get<glds::Program>("basic_program");
+	std::shared_ptr<glds::Shader> vshader = engine.Get<glds::ResourceSystem>()->Get<glds::Shader>("shaders/basic.vert", (void*)GL_VERTEX_SHADER);
+	std::shared_ptr<glds::Shader> fshader = engine.Get<glds::ResourceSystem>()->Get<glds::Shader>("shaders/basic.frag", (void*)GL_FRAGMENT_SHADER);
 
-	GLint status;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		char buffer[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
-		std::cout << buffer;
-	}
-
-	// Set Fragment Shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		char buffer[512];
-		glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
-		std::cout << buffer;
-	}
-
-	// Create Shader Program
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-
-	glLinkProgram(shaderProgram);
-	
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		char buffer[512];
-		glGetShaderInfoLog(shaderProgram, 512, NULL, buffer);
-		std::cout << buffer;
-	} 
-
-	glUseProgram(shaderProgram);
+	program->AddShader(vshader);
+	program->AddShader(fshader);
+	program->Link();
+	program->Use();
 
 	// vertex array
 	GLuint vao;
@@ -130,19 +62,30 @@ int main(int argc, char** argv)
 
 
 	// position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
 	// color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	// uniform
-	GLuint scaleLocation = glGetUniformLocation(shaderProgram, "scale");
-	float time = 0;
+	// uv
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
-	GLuint tintLocation = glGetUniformLocation(shaderProgram, "tint");
-	glm::vec3 tint{ 0.25f, 0.25f, 1.0f };
+	// texture
+	glds::Texture texture;
+	texture.CreateTexture("textures/llama.jpg");
+	texture.Bind();
+
+	// uniform
+	float time = 0;
+	program->SetUniform("scale", time);
+
+	glm::vec3 tint{ 1.0f, 1.0f, 1.0f };
+	program->SetUniform("tint", tint);
+
+
 
 	bool quit = false;
 	while (!quit)
@@ -163,20 +106,17 @@ int main(int argc, char** argv)
 		}
 
 		SDL_PumpEvents();
+		engine.Update();
 
-		time += 0.01f;
-		glUniform1f(scaleLocation, std::sin(time));
-		glUniform3fv(tintLocation, 1, &tint[0]);
+		time += engine.time.deltaTime;
+		program->SetUniform("scale", std::sin(time));
 
-		glClearColor(0.0f, 0.0f, 0.00f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		//engine.Get<glds::Renderer>()->BeginFrame();
+		engine.Get<glds::Renderer>()->BeginFrame();
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		//engine.Get<glds::Renderer>()->EndFrame();
+		engine.Get<glds::Renderer>()->EndFrame();
 	}
 
 	return 0;

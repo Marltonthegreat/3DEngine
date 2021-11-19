@@ -25,7 +25,7 @@
 
 //Graphics
 #include "Graphics/Renderer.h"
-#include "Graphics/Texture.h"
+#include "Graphics/Material.h"
 
 //Physics
 
