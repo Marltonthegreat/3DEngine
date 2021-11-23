@@ -9,6 +9,6 @@
 
     void main()
     {
-        outColor = vec4(fs_color, 1) * vec4(tint, 1) * texture(textureSampler, fs_texcoord);
-        //outColor = texture(textureSampler, fs_texcoord);
+        //outColor = vec4(fs_color, 1) * vec4(tint, 1) * texture(textureSampler, fs_texcoord);
+        outColor = texture(textureSampler, fs_texcoord);
     }

@@ -24,10 +24,8 @@
 #include "Audio/AudioSystem.h"
 
 //Graphics
-#include "Graphics/Renderer.h"
 #include "Graphics/Material.h"
-
-//Physics
+#include "Graphics/VertexIndexBuffer.h"
 
 //Input
 #include "Input/InputSystem.h"
