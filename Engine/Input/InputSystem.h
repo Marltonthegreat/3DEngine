@@ -29,6 +29,7 @@ namespace glds
 		bool IsPreviousKeyDown(int id);
 
 		const glm::vec2& GetMousePos() const { return mousePos; }
+		const glm::vec2& GetMouseRel() const { return mouseRel; }
 
 		bool IsButtonDown(int id) { return mouseButtonState[id]; };
 		bool IsPrevButtonDown(int id) { return prevMouseButtonState[id]; };
@@ -40,6 +41,8 @@ namespace glds
 		int numKeys;
 
 		glm::vec2 mousePos;
+		glm::vec2 prevMousePos;
+		glm::vec2 mouseRel;
 		std::array<Uint8, 3> mouseButtonState;
 		std::array<Uint8, 3> prevMouseButtonState;
 

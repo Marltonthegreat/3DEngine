@@ -12,6 +12,12 @@ namespace glds
 		std::copy(keyboardStateSDL, keyboardStateSDL + numKeys, keyboardState.begin());
 
 		prevKeyboardState = keyboardState;
+
+		// set initial mouse position
+		int x, y;
+		Uint32 buttons = SDL_GetMouseState(&x, &y);
+		mousePos = glm::vec2{ x , y };
+		prevMousePos = mousePos;
 	}
 
 	void InputSystem::Shutdown()
@@ -29,12 +35,14 @@ namespace glds
 
 		//Mouse
 		prevMouseButtonState = mouseButtonState;
+		prevMousePos = mousePos;
 		int x, y;
 		Uint32 buttons = SDL_GetMouseState(&x, &y);
 		mousePos = glm::vec2{ x, y };
 		mouseButtonState[0] = buttons & SDL_BUTTON_LMASK;
 		mouseButtonState[1] = buttons & SDL_BUTTON_MMASK;
 		mouseButtonState[2] = buttons & SDL_BUTTON_RMASK;
+		mouseRel = mousePos - prevMousePos;
 	}
 
 	InputSystem::eKeyState InputSystem::GetKeyState(int id)

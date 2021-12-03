@@ -1,6 +1,7 @@
 #pragma once
 
 #define REGISTER_CLASS(class) glds::ObjectFactory::Instance().Register<class>(#class)
+#define CREATE_ENGINE_OBJECT(class) glds::ObjectFactory::Instance().Create<glds::class>(#class)
 
 //Math
 #include "Math/Random.h"
@@ -12,6 +13,8 @@
 #include "Framework/EventSystem.h"
 #include "Framework/Singleton.h"
 #include "Framework/Factory.h"
+
+#include "Component/FreeCameraController.h"
 
 //Core
 #include "Core/Utilities.h"
@@ -25,7 +28,7 @@
 
 //Graphics
 #include "Graphics/Material.h"
-#include "Graphics/VertexIndexBuffer.h"
+#include "Graphics/VertexBuffer.h"
 
 //Input
 #include "Input/InputSystem.h"
@@ -35,8 +38,12 @@
 #include "Object/Scene.h"
 
 //Component
-#include "Component/PhysicsComponent.h"
 #include "Component/AudioComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/LightComponent.h"
+#include "Component/MeshComponent.h"
+#include "Component/ModelComponent.h"
+#include "Component/PhysicsComponent.h"
 
 // Resource
 #include "Resource/ResourceSystem.h"

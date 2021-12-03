@@ -1,88 +1,73 @@
 #include "Engine.h"
 
-#include <glad/glad.h>
-#include <SDL.h>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-#include <iostream>
-
-// vertices
-const float vertices[] =
-{
-	// front
-	-1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-	 1.0f,  1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-	-1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-	// back
-	-1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-	 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-	 1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-	-1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f
-};
-
-const GLuint indices[] =
-{
-	// front
-	0, 1, 2,
-	2, 3, 0,
-	// right
-	1, 5, 6,
-	6, 2, 1,
-	// back
-	7, 6, 5,
-	5, 4, 7,
-	// left
-	4, 0, 3,
-	3, 7, 4,
-	// bottom
-	4, 5, 1,
-	1, 0, 4,
-	// top
-	3, 2, 6,
-	6, 7, 3
-};
-
 int main(int argc, char** argv)
 {
-	glds::Engine engine;
-	engine.Startup();
-	engine.Get<glds::Renderer>()->Create("OpenGL", 800, 600);
+	// create engine
+	std::unique_ptr<glds::Engine> engine = std::make_unique<glds::Engine>();
+	engine->Startup();
+	engine->Get<glds::Renderer>()->Create("OpenGL", 800, 600);
+
+	// create scene
+	std::unique_ptr<glds::Scene> scene = std::make_unique<glds::Scene>();
+	scene->engine = engine.get();
 
 	glds::SeedRandom(static_cast<unsigned int>(time(nullptr)));
 	glds::SetFilePath("../resources");
 
-	std::shared_ptr<glds::Program> program = engine.Get<glds::ResourceSystem>()->Get<glds::Program>("basic_program");
-	std::shared_ptr<glds::Shader> vshader = engine.Get<glds::ResourceSystem>()->Get<glds::Shader>("shaders/basic.vert", (void*)GL_VERTEX_SHADER);
-	std::shared_ptr<glds::Shader> fshader = engine.Get<glds::ResourceSystem>()->Get<glds::Shader>("shaders/basic.frag", (void*)GL_FRAGMENT_SHADER);
+	// create camera
+	{
+		auto actor = CREATE_ENGINE_OBJECT(Actor);
+		actor->name = "camera";
+		actor->transform.position = glm::vec3{ 0, 0, 5 };
 
-	program->AddShader(vshader);
-	program->AddShader(fshader);
-	program->Link();
-	program->Use();
+		{
+			auto component = CREATE_ENGINE_OBJECT(CameraComponent);
+			component->SetPerspective(45.0f, 800.0f / 600.0f, 0.01f, 100.0f);
+			actor->AddComponent(std::move(component));
+		}
+		{
+			auto component = CREATE_ENGINE_OBJECT(FreeCameraController);
+			component->speed = 8;
+			component->sensitivity = 0.1f;
+			actor->AddComponent(std::move(component));
+		}
+		
+		scene->AddActor(std::move(actor));
+	}
 
-	// texture
-	glds::Texture texture;
-	texture.CreateTexture("textures/llama.jpg");
-	texture.Bind();
+	// create model
+	{
+		auto actor = CREATE_ENGINE_OBJECT(Actor);
+		actor->name = "model";
+		actor->transform.position = glm::vec3{ 0 };
+		actor->transform.scale = glm::vec3{ 1 };
 
-	std::shared_ptr<glds::VertexIndexBuffer> vertexBuffer = engine.Get<glds::ResourceSystem>()->Get<glds::VertexIndexBuffer>("vertex_index_buffer");
-	vertexBuffer->CreateVertexBuffer(sizeof(vertices), 8, (void*)vertices);
-	vertexBuffer->CreateIndexBuffer(GL_UNSIGNED_INT, 36, (void*)indices);
-	vertexBuffer->SetAttribute(0, 3, 8 * sizeof(float), 0);
-	vertexBuffer->SetAttribute(1, 3, 8 * sizeof(float), 3 * sizeof(float));
-	vertexBuffer->SetAttribute(2, 2, 8 * sizeof(float), 6 * sizeof(float));
+		auto component = CREATE_ENGINE_OBJECT(ModelComponent);
+		component->model = engine->Get<glds::ResourceSystem>()->Get<glds::Model>("models/cube.obj");
+		component->material = engine->Get<glds::ResourceSystem>()->Get<glds::Material>("materials/wood.mtl", engine.get());
 
-	// matrix uniform
-	glm::mat4 view = glm::lookAt(glm::vec3{ 0, 0, 2 }, glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 1, 0 });
-	program->SetUniform("view", view);
+		actor->AddComponent(std::move(component));
+		scene->AddActor(std::move(actor));
+	}
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-	program->SetUniform("projection", projection);
+	// create light
+	{
+		auto actor = CREATE_ENGINE_OBJECT(Actor);
+		actor->name = "light";
+		actor->transform.position = glm::vec3{ 4 };
+
+		auto component = CREATE_ENGINE_OBJECT(LightComponent);
+		component->ambient = glm::vec3{ 0.2f };
+		component->diffuse = glm::vec3{ 1 };
+		component->specular = glm::vec3{ 1 };
+
+		actor->AddComponent(std::move(component));
+		scene->AddActor(std::move(actor));
+	}
 
 	glm::vec3 translate{ 0 };
 	float angle = 0;
+
 	bool quit = false;
 	while (!quit)
 	{
@@ -102,37 +87,22 @@ int main(int argc, char** argv)
 		}
 
 		SDL_PumpEvents();
-		engine.Update();
+		engine->Update();
+		scene->Update(engine->time.deltaTime);
 
-		if (engine.Get<glds::InputSystem>()->GetKeyState(SDL_SCANCODE_A) == glds::InputSystem::eKeyState::Held)
+		// update actor
+		auto actor = scene->FindActor("model");
+		if (actor != nullptr)
 		{
-			translate.x -= 1 * engine.time.deltaTime;
+			actor->transform.rotation.y += engine->time.deltaTime;
 		}
-		if (engine.Get<glds::InputSystem>()->GetKeyState(SDL_SCANCODE_D) == glds::InputSystem::eKeyState::Held)
-		{
-			translate.x += 1 * engine.time.deltaTime;
-		}
-		if (engine.Get<glds::InputSystem>()->GetKeyState(SDL_SCANCODE_W) == glds::InputSystem::eKeyState::Held)
-		{
-			translate.y += 1 * engine.time.deltaTime;
-		}
-		if (engine.Get<glds::InputSystem>()->GetKeyState(SDL_SCANCODE_S) == glds::InputSystem::eKeyState::Held)
-		{
-			translate.y -= 1 * engine.time.deltaTime;
-		}
-		angle += engine.time.deltaTime;
 
-		glm::mat4 model{ 1.0f };
-		model = glm::translate(model, translate);
-		model = glm::rotate(model, angle, glm::vec3{ 0, 1, 0 });
-		model = glm::scale(model, glm::vec3{ 0.25f });
-		program->SetUniform("model", model);
+		engine->Get<glds::Renderer>()->BeginFrame();
 
-		engine.Get<glds::Renderer>()->BeginFrame();
+		scene->Draw(nullptr);
 
-		vertexBuffer->Draw(GL_TRIANGLES);
-
-		engine.Get<glds::Renderer>()->EndFrame();
+		engine->Get<glds::Renderer>()->EndFrame();
 	}
+
 	return 0;
 }

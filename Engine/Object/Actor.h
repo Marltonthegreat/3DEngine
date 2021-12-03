@@ -1,7 +1,10 @@
 #pragma once
-#include "Math/Transform.h"
+#include "Object.h"
+#include "Scene.h"
 #include "Component/Component.h"
+#include "Math/Transform.h"
 #include "Core/Serializable.h"
+
 #include <vector>
 #include <memory>
 

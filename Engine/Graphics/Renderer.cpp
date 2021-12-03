@@ -53,6 +53,8 @@ namespace glds
 			SDL_Log("Failed to create OpenGL context");
 			exit(-1);
 		}
+		
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void Renderer::BeginFrame()
