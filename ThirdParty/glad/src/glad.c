@@ -99,7 +99,9 @@ int open_gl(void) {
 
     unsigned int index = 0;
     for(index = 0; index < (sizeof(NAMES) / sizeof(NAMES[0])); index++) {
-        libGL = dlopen(NAMES[index], RTLD_NOW | RTLD_GLOBAL);
+        libGL = dlopen(NAMES[index], RTLD_NOW
+			
+			RTLD_GLOBAL);
 
         if(libGL != NULL) {
 #if defined(__APPLE__) || defined(__HAIKU__)

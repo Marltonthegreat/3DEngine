@@ -31,7 +31,7 @@ namespace glds
 		glShaderSource(shader, 1, &source_c, NULL);
 		glCompileShader(shader);
 
-				// check shader compilation status
+		// check shader compilation status
 		GLint status;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 		if (status == GL_FALSE)

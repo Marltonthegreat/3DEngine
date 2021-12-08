@@ -7,19 +7,10 @@ layout(location = 3) in vec3 tangent;
 out VS_OUT
 {
     vec3 position;
-    vec3 light_position;
     vec2 texcoord;
+    mat3 tbn;
 } vs_out;
 
-struct Light
-{
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    vec4 position;
-};
-
-uniform Light light;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -38,10 +29,8 @@ void main()
 
     	vec3 B = normalize(cross(N, T));
 
-    mat3 tbn = transpose(mat3(T, B, N));
+    	vs_out.tbn = mat3(T, B, N);
 
-    vs_out.position = tbn * vec3(model_view * vec4(position, 1.0));
-	vs_out.light_position = tbn * vec3(light.position);
-	vs_out.texcoord = texcoord;
+    vs_out.texcoord = texcoord;
     gl_Position = projection * model_view * vec4(position, 1.0f);
 }

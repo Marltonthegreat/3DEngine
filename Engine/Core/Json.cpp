@@ -22,7 +22,8 @@ namespace glds::json
 	bool Get(const rapidjson::Value& value, const std::string& name, int& data)
 	{
 		// check if 'name' member exists and is of type
-		if (value.HasMember(name.c_str()) == false || value[name.c_str()].IsInt() == false)
+		if (value.HasMember(name.c_str()) == false |
+			value[name.c_str()].IsInt() == false)
 		{
 			return false;
 		}

@@ -18,7 +18,6 @@ namespace glds
 		}
 
 		// color values
-		JSON_READ(document, ambient);
 		JSON_READ(document, diffuse);
 		JSON_READ(document, specular);
 		JSON_READ(document, shininess);
@@ -51,7 +50,6 @@ namespace glds
 		// set the shader (bind)
 		shader->Use();
 		// update shader material properties
-		shader->SetUniform("material.ambient", ambient);
 		shader->SetUniform("material.diffuse", diffuse);
 		shader->SetUniform("material.specular", specular);
 		shader->SetUniform("material.shininess", shininess);

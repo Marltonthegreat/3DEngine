@@ -82,5 +82,8 @@
     <None Include="..\Build\Resources\scenes\main.scn">
       <Filter>Resources\Scenes</Filter>
     </None>
+    <None Include="..\Build\Resources\materials\ogre.mtl">
+      <Filter>Resources\Materials</Filter>
+    </None>
   </ItemGroup>
 </Project>
