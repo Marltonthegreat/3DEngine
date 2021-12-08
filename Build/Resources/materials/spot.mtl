@@ -14,7 +14,8 @@
         1,
         1
     ],
-    "shader_name":"shaders/light.shdr",
+    "shininess": 1,
+    "shader_name":"shaders/phong.shdr",
     "texture_names":[
         "textures/spot.png"
     ]

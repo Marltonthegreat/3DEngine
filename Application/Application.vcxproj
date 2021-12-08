@@ -164,13 +164,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Build\Resources\materials\brick.mtl" />
     <None Include="..\Build\Resources\materials\spot.mtl" />
     <None Include="..\Build\Resources\materials\wood.mtl" />
+    <None Include="..\Build\Resources\scenes\main.scn" />
     <None Include="..\Build\Resources\shaders\basic.frag" />
     <None Include="..\Build\Resources\shaders\basic.vert" />
-    <None Include="..\Build\Resources\shaders\light.frag" />
-    <None Include="..\Build\Resources\shaders\light.shdr" />
-    <None Include="..\Build\Resources\shaders\light.vert" />
+    <None Include="..\Build\Resources\shaders\flat.frag" />
+    <None Include="..\Build\Resources\shaders\flat.shdr" />
+    <None Include="..\Build\Resources\shaders\flat.vert" />
+    <None Include="..\Build\Resources\shaders\gouraud.frag" />
+    <None Include="..\Build\Resources\shaders\gouraud.shdr" />
+    <None Include="..\Build\Resources\shaders\gouraud.vert" />
+    <None Include="..\Build\Resources\shaders\Phong.frag" />
+    <None Include="..\Build\Resources\shaders\Phong.shdr" />
+    <None Include="..\Build\Resources\shaders\Phong.vert" />
+    <None Include="..\Build\Resources\shaders\Phong_normal.frag" />
+    <None Include="..\Build\Resources\shaders\Phong_normal.shdr" />
+    <None Include="..\Build\Resources\shaders\Phong_normal.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

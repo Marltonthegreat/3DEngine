@@ -1,5 +1,5 @@
 {
-    "ambient": [
+    "ambient":[
         1,
         1,
         0
@@ -9,14 +9,15 @@
         1,
         1
     ],
-    "specular": [
+    "specular":[
         1,
         1,
         1
     ],
     "shininess": 255,
-    "shader_name":"shaders/phong.shdr",
+    "shader_name":"shaders/phong_normal.shdr",
     "texture_names":[
-        "textures/wood.png"
+        "textures/brick.png",
+        "textures/brick_normal.png"
     ]
 }
